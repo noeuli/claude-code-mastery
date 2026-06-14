@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>계산기</title>
+  <style>
+    /* CSS Grid로 버튼을 4열 배치 */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #1a1a2e;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .calculator {
+      background: #16213e;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      width: 320px;
+    }
+
+    /* 디스플레이 영역 */
+    .display {
+      background: #0f3460;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      text-align: right;
+    }
+    .display .expression {
+      color: #7fa8c9;
+      font-size: 14px;
+      min-height: 20px;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .display .result {
+      color: #e0e0e0;
+      font-size: 36px;
+      font-weight: 300;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* CSS Grid: 4열로 버튼 배치 */
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    button {
+      padding: 18px;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: transform 0.1s, opacity 0.1s;
+    }
+    button:active { transform: scale(0.93); }
+
+    .btn-num  { background: #1a1a4e; color: #e0e0e0; }
+    .btn-num:hover  { background: #252560; }
+    .btn-op   { background: #0f3460; color: #7fa8c9; }
+    .btn-op:hover   { background: #144080; }
+    .btn-eq   { background: #e94560; color: white; font-size: 22px; }
+    .btn-eq:hover   { background: #ff5577; }
+    .btn-clear { background: #533483; color: #e0e0e0; }
+    .btn-clear:hover { background: #6a42a8; }
+
+    /* 0 버튼은 2칸 차지 */
+    .span2 { grid-column: span 2; }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="display">
+      <!-- 현재 수식을 보여주는 작은 줄 -->
+      <div class="expression" id="expression"></div>
+      <!-- 현재 입력값 또는 결과 -->
+      <div class="result" id="result">0</div>
+    </div>
+
+    <div class="buttons">
+      <!-- 행 1: 기능 버튼 -->
+      <button class="btn-clear" onclick="clearAll()">AC</button>
+      <button class="btn-clear" onclick="toggleSign()">+/-</button>
+      <button class="btn-clear" onclick="percent()">%</button>
+      <button class="btn-op"    onclick="setOp('/')">÷</button>
+
+      <!-- 행 2~4: 숫자 + 연산자 -->
+      <button class="btn-num" onclick="input('7')">7</button>
+      <button class="btn-num" onclick="input('8')">8</button>
+      <button class="btn-num" onclick="input('9')">9</button>
+      <button class="btn-op"  onclick="setOp('*')">×</button>
+
+      <button class="btn-num" onclick="input('4')">4</button>
+      <button class="btn-num" onclick="input('5')">5</button>
+      <button class="btn-num" onclick="input('6')">6</button>
+      <button class="btn-op"  onclick="setOp('-')">−</button>
+
+      <button class="btn-num" onclick="input('1')">1</button>
+      <button class="btn-num" onclick="input('2')">2</button>
+      <button class="btn-num" onclick="input('3')">3</button>
+      <button class="btn-op"  onclick="setOp('+')">+</button>
+
+      <!-- 행 5: 0(2칸), 소수점, = -->
+      <button class="btn-num span2" onclick="input('0')">0</button>
+      <button class="btn-num"       onclick="inputDot()">.</button>
+      <button class="btn-eq"        onclick="calculate()">=</button>
+    </div>
+  </div>
+
+  <script>
+    /*
+     * 계산기 상태 (State)
+     * - current  : 현재 화면에 보이는 숫자 (문자열)
+     * - prev     : 연산자 누르기 전에 저장한 숫자
+     * - op       : 선택된 연산자 ('+', '-', '*', '/')
+     * - resetNext: 다음 숫자 입력 시 current를 초기화할지 여부
+     */
+    let current   = '0';
+    let prev      = null;
+    let op        = null;
+    let resetNext = false;
+
+    const resultEl = document.getElementById('result');
+    const exprEl   = document.getElementById('expression');
+
+    function updateDisplay() {
+      resultEl.textContent = current;
+    }
+
+    /* 숫자 버튼 입력 */
+    function input(val) {
+      if (resetNext) {
+        current = val;      // 새 숫자 입력 시작
+        resetNext = false;
+      } else {
+        current = current === '0' ? val : current + val;
+      }
+      updateDisplay();
+    }
+
+    /* 소수점 입력 (중복 방지) */
+    function inputDot() {
+      if (resetNext) { current = '0.'; resetNext = false; }
+      else if (!current.includes('.')) current += '.';
+      updateDisplay();
+    }
+
+    /* 연산자 선택 */
+    function setOp(o) {
+      // 이미 연산자가 있으면 중간 계산 먼저 수행 (연쇄 계산)
+      if (op && !resetNext) calculate(true);
+      prev = parseFloat(current);
+      op   = o;
+      resetNext = true;
+      const sym = { '+': '+', '-': '−', '*': '×', '/': '÷' }[o];
+      exprEl.textContent = `${prev} ${sym}`;
+    }
+
+    /* = 버튼: 최종 계산 */
+    function calculate(chain = false) {
+      if (op === null || prev === null) return;
+      const cur = parseFloat(current);
+      let res;
+      switch (op) {
+        case '+': res = prev + cur; break;
+        case '-': res = prev - cur; break;
+        case '*': res = prev * cur; break;
+        case '/': res = cur === 0 ? 'Error' : prev / cur; break;
+      }
+      const sym = { '+': '+', '-': '−', '*': '×', '/': '÷' }[op];
+      if (!chain) exprEl.textContent = `${prev} ${sym} ${cur} =`;
+      current   = res === 'Error' ? 'Error' : String(parseFloat(res.toFixed(10)));
+      if (!chain) { prev = null; op = null; }
+      resetNext = true;
+      updateDisplay();
+    }
+
+    /* AC: 전체 초기화 */
+    function clearAll() {
+      current = '0'; prev = null; op = null; resetNext = false;
+      exprEl.textContent = '';
+      updateDisplay();
+    }
+
+    /* +/- 부호 전환 */
+    function toggleSign() {
+      current = String(parseFloat(current) * -1);
+      updateDisplay();
+    }
+
+    /* % 퍼센트 변환 */
+    function percent() {
+      current = String(parseFloat(current) / 100);
+      updateDisplay();
+    }
+  </script>
+</body>
+</html>

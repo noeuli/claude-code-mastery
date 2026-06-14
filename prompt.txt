@@ -1,0 +1,36 @@
+나만의 프로필 웹사이트를 만들고 싶어. 다음 정보를 포함해줘:
+- 이름: 조봉호 
+- 직업/역할: Software Engineer
+- 소개: Healthcare Device SW Developer
+- 기술 스택: Java, C++, C#, Python, ARM ASM, C, Delphi, Visual Basic
+- 프로젝트/포트폴리오 섹션
+  Samsung Medison Ultarsound Device : RS85, W10, RS80A, WS80A, HS70A, etc.
+  팬택 베가, 스카이, 애니콜 개발
+  호텔 MIS (롯데 호텔, 프라자 호텔 등)
+  레스토랑 MIS(정글짐, 씨즐러 등)
+- 연락처: my@email.address
+githubt: my.github.com
+
+HTML, CSS, JavaScript로 만들고 Tailwind CSS CDN을 사용해줘.
+모던하고 깔끔한 디자인으로 만들어줘.
+
+먼저 어떻게 만들건지 계획을 보여줘
+
+기술태그 잘못 설정 되었어
+초음파장비: C#, Delphi, Python
+핸드폰 개발: Java, C++, C, ARM ASM
+MIS System: Visual Basic, Delphi, C++
+
+1번에서 
+이름 이니셜 BH + 조봉호 텍스트 말고
+BH 대신에 N을 써줘. 이메일이 n으로 시작해
+
+경력 사항 아래쪽에 추가로
+각 년도별로 다녔던 회사도 포함시키면 좋겠어
+2015년 5월~ 현재 (재직기간 계산): 삼성메디슨, 초음파 SW
+2008년 ~ 2014년: 팬택, 스카이 국내향, Verizon향 SW
+2006년 ~ 2008년: 에프엠테크놀러지, 애니콜 Verizon향 SW
+2004년 ~ 2006년: 엑사텔레콤, 애니콜 Verizon향 SW
+2000년 ~ 2003년: 월드 데이타 시스템, F&B/Front-Office System
+
+카테고리: 
